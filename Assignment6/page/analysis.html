@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analysis</title>
+    <!-- 引入 echarts 绘图库 -->
+    <script src="/js/echarts.min.js"></script>
+    <!-- 引入 echarts 中国地图数据 -->
+    <script src="/js/china.js"></script>
+
+    <link rel="stylesheet" href="/css/analysis.css">
+    <link rel="stylesheet" href="/css/floatingButton.css">
+    <script src="/js/floatingButton.js"></script>
+</head>
+<body>
+<!-- 背景图片 -->
+<!--<img alt="homeBackground" src="/images/homeBackground.jpg" class="homeBackground-img">-->
+
+<!-- 悬浮按钮容器 -->
+<div class="floating-btn" onmousedown="startDrag(event)" onmouseup="stopDrag()">
+    <!-- 主按钮 -->
+    <div>+</div>
+
+    <!-- 子按钮 -->
+    <div class="sub-btn" onclick="location.href='../index.html'">起始页</div>
+    <div class="sub-btn" onclick="location.href='home.html'">首页</div>
+    <div class="sub-btn" onclick="location.href='forecast.html'">未来预测</div>
+    <div class="sub-btn" onclick="location.href='about.html'">关于我们</div>
+
+</div>
+
+<div id="map"></div>
+
+<script>
+    // 初始化图表容器
+    var chart = echarts.init(document.getElementById('map'));
+
+    // 配置地图选项
+    var option = {
+        title: {
+            text: '点击省市查看详情>>',
+            x: 'center',
+            top: 50,
+            textStyle: {
+                color: '#000000'
+            }
+        },
+
+        tooltip: {
+            trigger: 'item',
+            formatter: '{b}'
+        },
+        series: [
+            {
+                top: 100,
+                type: 'map',
+                map: 'china',
+                roam: false, // 禁用地图的拖拽漫游
+                label: {
+                    show: true,
+                    fontSize: 10
+                },
+                itemStyle: {
+                    areaColor: 'rgba(192,30,30,0.30)',
+                    borderColor: '#404a59',
+                    borderWidth: 1
+                },
+                emphasis: {
+                    label: {
+                        show: true
+                    },
+                    itemStyle: {
+                        // areaColor: '#2a333d' // 鼠标悬停的颜色，默认为黄色
+                    }
+                }
+            }
+        ]
+    };
+
+    // 将配置应用到图表
+    chart.setOption(option);
+
+    // 为地图添加点击事件
+    chart.on('click', function (params) {
+        // 获取省份名称
+        var province = params.name;
+
+        // 实现页面跳转，并通过URL参数传递省份名称。假设跳转的页面地址为：show_province.html
+        window.location.href = 'reason.html?province=' + encodeURIComponent(province);
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+/* 背景图片 */
+.background-img {
+    position: absolute; /* 设置为绝对定位 */
+    top: 0; /* 顶部边距为0 */
+    left: 0; /* 左边边距为0 */
+    width: 100%; /* 宽度占满整个父容器 */
+    height: 100%; /* 高度占满整个父容器 */
+    object-fit: cover; /* 图片保持比例填充整个容器 */
+    z-index: -1; /* 设置为较低的图层 */
+}
+
+/* 导航栏 */
+.navbar {
+    display: flex; /* 使用弹性布局 */
+    justify-content: space-around; /* 子元素水平等间距排列 */
+    align-items: center; /* 子元素垂直居中对齐 */
+    height: 50px; /* 导航栏的高度 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 底部投影，增加立体感 */
+    position: fixed; /* 固定在顶部 */
+    width: 100%; /* 宽度占满整个视口 */
+    background-color: rgb(40, 40, 40); /* 背景颜色设置为黑色 */
+    z-index: 10; /* 设置为较高的图层 */
+    top: 0; /* 顶部边距为0 */
+    left: 0; /* 左边边距为0 */
+}
+
+/* 导航栏图片 */
+.navbar-logo {
+    height: 50px; /* 图片高度占满导航栏 */
+    width: auto; /* 宽度自适应 */
+    padding-right: 5px; /* 图片与其他导航项之间的间距 */
+}
+
+/* 导航栏按钮 */
+.navbar button {
+    padding: 8px 12px; /* 按钮内部填充 */
+    margin: 0 5px; /* 按钮之间的间距 */
+    background-color: rgb(40, 40, 40); /* 背景颜色 */
+    color: #ffffff; /* 文字颜色 */
+    border: 1px solid rgb(40, 40, 40); /* 边框颜色和宽度 */
+    border-radius: 3px; /* 边角的圆角半径 */
+    transition: all 0.3s ease-in-out; /* 过渡效果 */
+    font-size: 16px; /* 文字大小 */
+}
+
+/* 导航栏按钮在悬停时的样式 */
+.navbar button:hover {
+    background-color: rgb(50, 50, 50); /* 悬停时的背景颜色 */
+    color: #aeabab; /* 悬停时保持文字白色 */
+}
+
+/* 悬停信息框样式 */
+.hover-info {
+    display: none; /* 默认不显示 */
+    position: absolute; /* 定位方式为绝对定位 */
+    background-color: rgb(40, 40, 40); /* 背景颜色 */
+    border: 1px solid #ddd; /* 边框样式和颜色 */
+    margin-top: 5px; /* 上边距为5px */
+    padding: 15px; /* 内边距为15px */
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); /* 阴影效果 */
+    z-index: 1; /* 图层较高 */
+    top: 40px; /* 顶部边距为40px */
+    right: 0px; /* 右边边距为0px */
+    color: white; /* 文本颜色为白色 */
+    white-space: pre; /* 保留空白符 */
+    font-size: 13px; /* 字体大小为13px */
+}
+
+/* 显示悬停信息框 */
+.navbar a:hover .hover-info {
+    display: block; /* 悬停时显示 */
+    height: 100px; /* 高度为100px */
+    width: 25%; /* 宽度为25% */
+    border-color: rgb(40, 40, 40); /* 边框颜色为黑色 */
+}
+
+/* 悬停在悬停信息框样式 */
+.navbar a:hover .hover-info:hover{
+    color: #aeabab; /* 悬停时保持文字白色 */
+}
+
+/* 文本 */
+.content {
+    color: cornsilk; /* 文本颜色为cornsilk */
+    display: flex; /* 使用弹性布局 */
+    flex-direction: column; /* 垂直方向排列 */
+    align-items: flex-end; /* 水平靠右对齐 */
+    justify-content: center; /* 垂直居中对齐 */
+    height: 100vh; /* 高度占满整个视口 */
+    margin-right: 12%; /* 右边距离为12% */
+    margin-top: -5%; /* 上边距离为-5% */
+}
+
+/* 文本内按钮 */
+.content-button {
+    background-color: transparent; /* 设置按钮背景颜色 */
+    color: azure; /* 设置按钮文本颜色 */
+    border: none; /* 移除按钮边框 */
+    padding: 10px 50px; /* 设置按钮内边距 */
+    font-size: 23px; /* 字体大小为23px */
+    position: fixed;  /* 设置按钮位置固定 */
+    bottom: 20px; /* 距离底部的距离 */
+    right: 20px; /* 距离右侧的距离 */
+    cursor: pointer; /* 设置鼠标悬停样式为手型 */
+}

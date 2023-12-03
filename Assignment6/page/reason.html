@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Reason</title>
+    <!-- 引入 echarts 绘图库 -->
+    <script src="/js/echarts.min.js"></script>
+    <!-- 引入 echarts 中国地图数据 -->
+    <script src="/js/china.js"></script>
+
+    <link rel="stylesheet" href="/css/reason.css">
+</head>
+<body>
+<div>
+    <h3>您选择的地区是: <span id="province"></span></h3>
+    <h5>注：2015年为1%人口抽样调查样本数据，2020年暂无数据，其他年份为1‰人口变动调查样本数据。</h5>
+
+    <!-- 添加返回按钮 -->
+    <button id="backButton">返回地图>></button>
+
+    <!-- 下拉菜单容器，用于选择年份 -->
+    <div class="select-container">
+        <!-- 下拉菜单，用户可以选择年份，并且当选择改变时，会触发 loadDataForYear 函数加载对应年份的数据 -->
+        <select id="yearSelect" onchange="loadIndustryDataForYear(this.value),loadPopulationDataForYear(this.value)"
+                class="styled-select">
+            <!-- 为每一个年份提供一个选项 -->
+            <option value="2013">2013年</option>
+            <option value="2014">2014年</option>
+            <option value="2015">2015年</option>
+            <option value="2016">2016年</option>
+            <option value="2017">2017年</option>
+            <option value="2018">2018年</option>
+            <option value="2019">2019年</option>
+            <option value="2020">2020年</option>
+            <option value="2021">2021年</option>
+            <!-- 默认选中2022年 -->
+            <option value="2022" selected>2022年</option>
+        </select>
+    </div>
+
+    <!-- Pie Chart 容器 -->
+    <div id="pieChart"></div>
+
+    <div id="doublePieChart"></div>
+
+</div>
+
+<script>
+    // 自定义函数，用于解析 URL 参数
+    function getQueryString(name) {
+        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+        var result = window.location.search.substr(1).match(reg);
+        return result ? decodeURIComponent(result[2]) : null;
+    }
+
+    function loadIndustryDataForYear(year) {
+        const selectedIndex = 2022 - year;  // 计算所选年份的索引
+
+        Promise.all([
+            fetch('../data/industry1.csv'),
+            fetch('../data/industry2.csv'),
+            fetch('../data/industry3.csv')
+        ])
+            .then(responses => Promise.all(responses.map(response => response.text())))
+            .then(texts => {
+                var industryData = [];
+                var province = getQueryString('province');
+                var type = ['第一产业', '第二产业', '第三产业'];
+
+                texts.forEach((text, index) => {
+                    var rows = text.split("\r\n");
+                    for (var i = 0; i < rows.length; i++) {
+                        var cols = rows[i].split(',');
+                        if (province === cols[0]) {
+                            industryData.push({value: parseFloat(cols[selectedIndex + 1]), name: type[index]});
+                        }
+                    }
+                });
+
+                const option = pieChart.getOption();  // 获取当前图表的配置项
+                option.series[0].data = industryData;  // 更新数据
+                pieChart.setOption(option);  // 重新设置图表的配置项
+            });
+    }
+
+
+    const pieChart = echarts.init(document.getElementById('pieChart'));
+    const pieOption = {
+        title: {
+            text: '产业结构',
+            subtext: '单位：亿元',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: '{b}: {c} (占比: {d}%)'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            data: ['第一产业', '第二产业', '第三产业']
+        },
+        series: [
+            {
+                name: '产业结构',
+                type: 'pie',
+                radius: '50%',
+                data: [],
+                label: {
+                    show: true,
+                    position: 'outside',
+                    formatter: '{b}: {c}'
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+    pieChart.setOption(pieOption);
+
+    const doublePieChart = echarts.init(document.getElementById('doublePieChart'));
+
+    function loadPopulationDataForYear(year) {
+        if (year === '2020') {
+            const grayColors = ['#AAAAAA', '#BBBBBB', '#CCCCCC', '#DDDDDD', '#EEEEEE'];
+            let option = {
+                title: {
+                    text: '人口抽查数据(暂无数据)',
+                    subtext: '总抚养比:0',
+                    left: 'center',
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                },
+                series: [
+                    {
+                        name: '人口数量',
+                        type: 'pie',
+                        radius: [0, '40%'],
+                        itemStyle: {color: params => grayColors[params.dataIndex]},
+                        data: [
+                            {value: 0, name: '0-14岁'},
+                            {value: 0, name: '15-64岁'},
+                            {value: 0, name: '65岁以上'},
+                        ],
+                    },
+                    {
+                        name: '抚养比',
+                        type: 'pie',
+                        radius: ['50%', '70%'],
+                        itemStyle: {color: params => grayColors[params.dataIndex + 3]},
+                        data: [
+                            {value: 0, name: '少年儿童抚养比'},
+                            {value: 0, name: '老年人口抚养比'},
+                        ],
+                    },
+                ]
+            }
+            // 使用刚指定的配置项和数据显示图表。
+            doublePieChart.setOption(option, true);
+        } else {
+            // 使用fetch API从服务器获取CSV文件数据
+            fetch('../data/population' + year + '.csv')
+                .then(response => response.text())
+                .then(function (data) {
+                    var province = getQueryString('province');
+
+                    // 解析CSV数据
+                    const lines = data.split('\r\n');
+                    var provinceData = [];
+                    for (var i = 0; i < lines.length; i++) {
+                        if (province === lines[i].split(',')[0]) {
+                            provinceData = lines[i];
+                            // console.log(provinceData);
+                        }
+                    }
+
+                    let theProvinceData = provinceData.split(',');
+                    // console.log(theProvinceData);
+
+                    // 构造嵌套饼图的数据
+                    let innerPieData = [],
+                        outerPieData = [];
+
+                    innerPieData.push(
+                        {value: theProvinceData[2], name: '0-14岁'},
+                        {value: theProvinceData[3], name: '15-64岁'},
+                        {value: theProvinceData[4], name: '65岁以上'}
+                    );
+                    outerPieData.push(
+                        // {value: theProvinceData[5], name: '总抚养比'},
+                        {value: theProvinceData[6], name: '少年儿童抚养比'},
+                        {value: theProvinceData[7], name: '老年抚养比'}
+                    );
+
+                    let option = {
+                        title: {
+                            text: '人口抽查数据(抽查人数:' + theProvinceData[1] + '人)',
+                            subtext: '总抚养比:' + theProvinceData[5],
+                            left: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item'
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                        },
+                        series: [
+                            {
+                                name: '人口数',
+                                type: 'pie',
+                                // position: 'right',
+                                right: -50,
+                                selectedMode: 'single',
+                                radius: [0, '40%'],
+                                label: {
+                                    position: 'outer',
+                                    formatter: '{b}',//'{b}: {@2012} ({d}%)'
+                                },
+                                data: innerPieData
+                            },
+                            {
+                                name: '抚养比',
+                                type: 'pie',
+                                // position: 'right',
+                                right: -50,
+                                radius: ['50%', '70%'],
+                                labelLine: {
+                                    length: 0
+                                },
+                                label: {
+                                    formatter: '{b|{b}：}{c}  {per|{d}%}  ',
+                                    backgroundColor: '#F6F8FC',
+                                    borderColor: '#8C8D8E',
+                                    borderWidth: 1,
+                                    borderRadius: 4,
+                                    rich: {
+                                        a: {
+                                            color: '#6E7079',
+                                            lineHeight: 22,
+                                            align: 'center'
+                                        },
+                                        hr: {
+                                            borderColor: '#8C8D8E',
+                                            width: '100%',
+                                            borderWidth: 0.5,
+                                            height: 0
+                                        },
+                                        b: {
+                                            color: '#4C5058',
+                                            fontSize: 14,
+                                            fontWeight: 'bold',
+                                            lineHeight: 33
+                                        },
+                                        per: {
+                                            color: '#fff',
+                                            backgroundColor: '#4C5058',
+                                            padding: [2, 4],
+                                            borderRadius: 2
+                                        }
+                                    }
+                                },
+                                data: outerPieData
+                            }
+                        ]
+                    };
+
+                    // 使用刚指定的配置项和数据显示图表。
+                    doublePieChart.setOption(option, true);
+                })
+                .catch(error => console.error('Error fetching and parsing data:', error));
+        }
+
+    }
+
+    window.onload = function () {
+        // 获取省份名称并显示
+        var province = getQueryString('province');
+        document.getElementById('province').innerText = province || '未知省份';
+
+        // 绑定返回按钮点击事件
+        document.getElementById('backButton').onclick = function () {
+            window.location.href = document.referrer;
+        };
+
+        // 默认加载2022年的数据
+        loadIndustryDataForYear(2022);
+        loadPopulationDataForYear(2022);
+    };
+
+</script>
+</body>
+</html>

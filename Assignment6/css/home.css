@@ -1,0 +1,47 @@
+/* 背景图片 */
+.homeBackground-img {
+    position: absolute; /* 设置为绝对定位 */
+    top: 0; /* 顶部边距为0 */
+    left: 0; /* 左边边距为0 */
+    width: 100%; /* 宽度占满整个父容器 */
+    height: 100%; /* 高度占满整个父容器 */
+    object-fit: cover; /* 图片保持比例填充整个容器 */
+    z-index: -1; /* 设置为较低的图层 */
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif; /* 设置默认字体 */
+}
+
+/* 自定义下拉菜单样式 */
+.styled-select {
+    padding: 10px; /* 内填充 */
+    margin: 20px; /* 外边距 */
+    font-size: 16px; /* 字体大小 */
+    border-radius: 5px; /* 边框圆角 */
+    border: 1px solid #ccc; /* 边框样式 */
+    outline: none; /* 当元素聚焦时移除轮廓 */
+}
+
+/* 下拉菜单容器的样式，用于调整位置 */
+.select-container {
+    text-align: right; /* 使下拉菜单在容器中水平居中 */
+    margin-top: 20px; /* 距离页面顶端的空间 */
+}
+
+/* echarts 图表容器的样式 */
+#chart {
+    width: 60%; /* 图表的宽度 */
+    height: 600px; /* 图表的高度 */
+    display: inline-block;
+    margin: 0 auto; /* 上下边距为0，左右边距自动调整以使图表水平居中 */
+}
+
+#pieChart {
+    width: 35%; /* 图表的宽度 */
+    height: 600px; /* 图表的高度 */
+    display: inline-block;
+    /*float: left;*/
+}
+

@@ -1,0 +1,15 @@
+/* 背景图片 */
+.homeBackground-img {
+    position: absolute; /* 设置为绝对定位 */
+    top: 0; /* 顶部边距为0 */
+    left: 0; /* 左边边距为0 */
+    width: 100%; /* 宽度占满整个父容器 */
+    height: 100%; /* 高度占满整个父容器 */
+    object-fit: cover; /* 图片保持比例填充整个容器 */
+    z-index: -1; /* 设置为较低的图层 */
+}
+
+#map {
+    width: 100%;
+    height: 700px;
+}

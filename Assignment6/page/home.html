@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>home</title>
+    <!-- 引入 echarts 绘图库 -->
+    <script src="/js/echarts.min.js"></script>
+    <!-- 引入 echarts 中国地图数据 -->
+    <script src="/js/china.js"></script>
+    <!-- 引入页面相关的样式 -->
+    <link rel="stylesheet" href="/css/home.css">
+    <!-- 引入悬浮按钮的 JavaScript 文件 -->
+    <script src="/js/floatingButton.js"></script>
+</head>
+
+<body>
+<!-- 注释掉了背景图片，如果需要，可以取消下面这行代码的注释 -->
+<!--<img alt="homeBackground" src="/images/homeBackground.jpg" class="homeBackground-img">-->
+
+<!-- 用于加载悬浮按钮的容器 -->
+<div id="floating-button"></div>
+
+<!-- 下拉菜单容器，用于选择年份 -->
+<div class="select-container">
+    <!-- 下拉菜单，用户可以选择年份，并且当选择改变时，会触发 loadDataForYear 函数加载对应年份的数据 -->
+    <select id="yearSelect" onchange="loadDataForYear(this.value)" class="styled-select">
+        <!-- 为每一个年份提供一个选项 -->
+        <option value="2013">2013年</option>
+        <option value="2014">2014年</option>
+        <option value="2015">2015年</option>
+        <option value="2016">2016年</option>
+        <option value="2017">2017年</option>
+        <option value="2018">2018年</option>
+        <option value="2019">2019年</option>
+        <option value="2020">2020年</option>
+        <option value="2021">2021年</option>
+        <!-- 默认选中2022年 -->
+        <option value="2022" selected>2022年</option>
+    </select>
+</div>
+
+<!-- 用于展示地图的容器 -->
+<div id="chart"></div>
+<!-- 用于展示饼图的容器 -->
+<div id="pieChart"></div>
+
+<script>
+    // 初始化 echarts 实例
+    const mapChart = echarts.init(document.getElementById('chart'));
+    const pieChart = echarts.init(document.getElementById('pieChart'));
+
+    // 根据选择的年份，加载对应的数据
+    function loadDataForYear(year) {
+        // 获取对应年份的 GDP 数据
+        fetch('../data/provinceGDP.csv')
+            .then(response => response.text())
+            .then(data => {
+                // 解析 CSV 数据并准备用于绘制图表的数据
+                var col = 2023 - year;
+                var GDPData = [];
+                var rows = data.split("\n");
+                for (var i = 0; i < rows.length; i++) {
+                    var rowData = rows[i].split(",");
+                    GDPData.push({name: rowData[0], value: parseFloat(rowData[col])});
+                }
+
+                // 计算最大值和最小值用于地图的视觉映射组件
+                const values = GDPData.map(item => item.value);
+                const maxValue = Math.max(...values);
+                const minValue = Math.min(...values);
+                // 计算总 GDP
+                let totalGdp = GDPData.reduce((acc, item) => acc + item.value, 0);
+
+                // 准备地图的配置项
+                const option = {
+                    // 图表主标题
+                    title: {
+                        text: '中国各省市' + year + ' 年 GDP(总量：' + totalGdp.toFixed(1) + '亿元)',
+                        subtext: '单位：亿元',
+                        x: 'center'
+                    },
+                    // 鼠标悬停时的提示框
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: function (params) {
+                            const item = GDPData.find(item => item.name === params.name);
+                            return params.name + '<br>GDP: ' + ((item && item.value) ? item.value.toFixed(1) : '暂无数据');
+                        }
+                    },
+                    // 视觉映射组件，用于控制地图颜色的深浅
+                    visualMap: {
+                        min: minValue,
+                        max: maxValue,
+                        text: ['最大：' + maxValue.toFixed(1), '最小：' + minValue.toFixed(1)],
+                        realtime: false,
+                        left: 0, // 将组件放置在右侧
+                        inRange: {
+                            color: ['#e0ffff', '#006edd'] // 定义一个蓝色的颜色渐变范围
+                        },
+                        calculable: true
+                    },
+                    // 地图系列数据
+                    series: [
+                        {
+                            name: '中国各省市' + year + ' 年 GDP',
+                            type: 'map',
+                            map: 'china', // 使用的地图类型为中国地图
+                            roam: false, // 禁用地图的拖拽漫游
+                            label: { // 地图上的文本标签
+                                show: true,
+                                color: '#000'
+                            },
+                            // 实际的数据
+                            data: GDPData
+                        }
+                    ]
+                };
+
+                // 准备饼图的配置项
+                const pieOption = {
+                    // 图表标题
+                    title: {
+                        text: year + ' 年各省市 GDP 占比',
+                        subtext: '单位：亿元',
+                        top: 'top',
+                        x: 'center'
+                    },
+                    // 鼠标悬停时的提示框
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{b}: {c} ({d}%)'
+                    },
+                    // 饼图系列数据
+                    series: [
+                        {
+                            name: 'GDP 占比',
+                            type: 'pie',
+                            radius: '50%', // 饼图的半径
+                            center: ['50%', '50%'], // 饼图的位置
+                            data: GDPData,
+                            label: {
+                                formatter: '{b}: {c} ({d}%)'
+                            },
+                            // 高亮的扇区和阴影样式
+                            itemStyle: {
+                                emphasis: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            },
+                            // 鼠标悬停时的样式变化
+                            emphasis: {
+                                itemStyle: {
+                                    borderColor: 'rgba(255, 255, 255, 1)',
+                                    borderWidth: 2
+                                }
+                            }
+                        }
+                    ]
+                };
+
+
+                // 更新地图和饼图的数据
+                mapChart.setOption(option, true);
+                pieChart.setOption(pieOption, true);
+
+
+                // 添加交互功能：地图省份的鼠标悬停事件监听器
+                mapChart.on('mouseover', function (params) {
+                    if(params.componentType === 'series' && params.seriesType === 'map') {
+                        var provinceName = params.name;
+
+                        // 高亮饼图上对应的省份扇区
+                        pieChart.dispatchAction({
+                            type: 'highlight',
+                            seriesName: 'GDP 占比',
+                            name: provinceName
+                        });
+                    }
+                });
+
+                // 添加鼠标移出事件监听器，取消高亮效果
+                mapChart.on('mouseout', function (params) {
+                    if(params.componentType === 'series' && params.seriesType === 'map') {
+                        var provinceName = params.name;
+
+                        // 取消饼图上对应省份扇区的高亮
+                        pieChart.dispatchAction({
+                            type: 'downplay',
+                            seriesName: 'GDP 占比',
+                            name: provinceName
+                        });
+                    }
+                });
+
+                // 添加交互功能：饼图扇区的鼠标悬停事件监听器
+                pieChart.on('mouseover', function (params) {
+                    if (params.componentType === 'series') {
+                        const targetName = params.name;
+
+                        // 高亮地图上对应的省份
+                        mapChart.dispatchAction({
+                            type: 'highlight',
+                            seriesName: '中国各省 ' + year + ' 年 GDP',
+                            name: targetName
+                        });
+                    }
+                });
+
+                // 添加鼠标移出事件监听器，取消高亮效果
+                pieChart.on('mouseout', function (params) {
+                    if (params.componentType === 'series') {
+                        const targetName = params.name;
+
+                        mapChart.dispatchAction({
+                            type: 'downplay',
+                            seriesName: '中国各省 ' + year + ' 年 GDP',
+                            name: targetName
+                        });
+                    }
+                });
+
+            })
+            .catch(error => {
+                // 处理数据加载失败的情况
+                console.error('Error loading the GDP data:', error);
+            });
+    }
+
+    // 页面加载完成后默认显示最新一年的数据
+    window.onload = function () {
+        loadDataForYear('2022');
+    };
+
+    // 在文档加载完毕后，调用 floatingButton 文件以实现悬浮按钮功能
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('floatingButton.html')
+            .then(response => response.text())
+            .then(data => {
+                // 将加载的悬浮按钮 HTML 内容设置到页面上
+                document.getElementById('floating-button').innerHTML = data;
+            })
+            .catch(error => {
+                // 处理悬浮按钮文件加载失败的情况
+                console.error('Error fetching the floating button:', error);
+            });
+    });
+</script>
+</body>
+</html>

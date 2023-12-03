@@ -1,0 +1,42 @@
+/* 文本内按钮 */
+#backButton {
+    background-color: transparent; /* 设置按钮背景颜色 */
+    color: darkslateblue; /* 设置按钮文本颜色 */
+    border: none; /* 移除按钮边框 */
+    padding: 10px 50px; /* 设置按钮内边距 */
+    font-size: 23px; /* 字体大小为23px */
+    position: fixed; /* 设置按钮位置固定 */
+    bottom: 20px; /* 距离底部的距离 */
+    right: 20px; /* 距离右侧的距离 */
+    cursor: pointer; /* 设置鼠标悬停样式为手型 */
+}
+
+/* 自定义下拉菜单样式 */
+.styled-select {
+    padding: 10px; /* 内填充 */
+    margin: 20px; /* 外边距 */
+    font-size: 16px; /* 字体大小 */
+    border-radius: 5px; /* 边框圆角 */
+    border: 1px solid #ccc; /* 边框样式 */
+    outline: none; /* 当元素聚焦时移除轮廓 */
+}
+
+/* 下拉菜单容器的样式，用于调整位置 */
+.select-container {
+    text-align: right; /* 使下拉菜单在容器中水平居中 */
+    margin-top: 20px; /* 距离页面顶端的空间 */
+}
+
+#pieChart {
+    width: 600px; /* 图表的宽度 */
+    height:400px; /* 图表的高度 */
+    display: inline-block;
+    /*float: left;*/
+}
+
+#doublePieChart {
+    width: 800px; /* 图表的宽度 */
+    height:400px; /* 图表的高度 */
+    display: inline-block;
+    /*float: left;*/
+}

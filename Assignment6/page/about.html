@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About</title>
+    <link rel="stylesheet" href="/css/about.css">
+    <link rel="stylesheet" href="/css/floatingButton.css">
+    <script src="/js/floatingButton.js"></script>
+</head>
+<body>
+    <!-- 背景图片 -->
+    <img alt="aboutBackground" src="/images/aboutBackground.jpg" class="aboutBackground-img">
+
+    <!-- 悬浮按钮容器 -->
+    <div class="floating-btn" onmousedown="startDrag(event)" onmouseup="stopDrag()">
+        <!-- 主按钮 -->
+        <div>+</div>
+
+        <!-- 子按钮 -->
+        <div class="sub-btn" onclick="location.href='../index.html'">起始页</div>
+        <div class="sub-btn" onclick="location.href='home.html'">首页</div>
+        <div class="sub-btn" onclick="location.href='analysis.html'">原因分析</div>
+        <div class="sub-btn" onclick="location.href='forecast.html'">未来预测</div>
+
+    </div>
+
+<script>
+    // 调用 floatingButton 实现悬浮按钮
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('floatingButton.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('floating-button').innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error fetching the floating button:', error);
+            });
+    });
+</script>
+</body>
+</html>
