@@ -4,7 +4,7 @@
     top: 0; /* 顶部边距为0 */
     left: 0; /* 左边边距为0 */
     width: 100%; /* 宽度占满整个父容器 */
-    height: 100%; /* 高度占满整个父容器 */
+    height: 200%; /* 高度占满整个父容器 */
     object-fit: cover; /* 图片保持比例填充整个容器 */
     z-index: -1; /* 设置为较低的图层 */
 }
@@ -45,3 +45,62 @@ body {
     /*float: left;*/
 }
 
+#radar0 {
+    width: 30%; /* 图表的宽度 */
+    height: 800px; /* 图表的高度 */
+    display: inline-block;
+    /*float: left;*/
+}
+
+#radar1 {
+    width: 30%; /* 图表的宽度 */
+    height: 800px; /* 图表的高度 */
+    display: inline-block;
+    /*float: left;*/
+}
+
+#radar2 {
+    width: 30%; /* 图表的宽度 */
+    height: 800px; /* 图表的高度 */
+    display: inline-block;
+    /*float: left;*/
+}
+
+.vertical-line1 {
+    position: absolute; /* 使用绝对定位 */
+    top: 0; /* 从容器顶部开始 */
+    left: 55%; /* 竖线的横向位置，这里为容器宽度的一半 */
+    width: 2px;  /* 竖线的宽度 */
+    height: 100%; /* 竖线的高度 */
+    background-color: white; /* 竖线的颜色 */
+    /* 调整 top 和 left 的值可以改变竖线的具体位置 */
+}
+
+.horizontal-line1 {
+    position: absolute; /* 使用固定定位 */
+    top: 100%; /* 横线的纵向位置，这里为视口高度的一半 */
+    left: 0;
+    width: 100%; /* 横线的宽度 */
+    height: 2px; /* 横线的高度 */
+    background-color: white; /* 横线的颜色 */
+}
+
+/*.vertical-line2 {*/
+/*    position: absolute; !* 使用绝对定位 *!*/
+/*    top: 100%; !* 从容器顶部开始 *!*/
+/*    left: 30%; !* 竖线的横向位置，这里为容器宽度的一半 *!*/
+/*    width: 2px;  !* 竖线的宽度 *!*/
+/*    height: 100%; !* 竖线的高度 *!*/
+/*    background-color: white; !* 竖线的颜色 *!*/
+/*    !* 调整 top 和 left 的值可以改变竖线的具体位置 *!*/
+/*}*/
+
+/*.vertical-line3 {*/
+/*    position: absolute; !* 使用绝对定位 *!*/
+/*    top: 100%; !* 从容器顶部开始 *!*/
+/*    left: 60%; !* 竖线的横向位置，这里为容器宽度的一半 *!*/
+/*    width: 2px;  !* 竖线的宽度 *!*/
+/*    height: 100%; !* 竖线的高度 *!*/
+/*    background-color: white; !* 竖线的颜色 *!*/
+/*    !* 调整 top 和 left 的值可以改变竖线的具体位置 *!*/
+/*}*/

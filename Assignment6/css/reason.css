@@ -1,3 +1,14 @@
+/* 背景图片 */
+.reasonBackground-img {
+    position: absolute; /* 设置为绝对定位 */
+    top: 0; /* 顶部边距为0 */
+    left: 0; /* 左边边距为0 */
+    width: 100%; /* 宽度占满整个父容器 */
+    height: 200%; /* 高度占满整个父容器 */
+    object-fit: cover; /* 图片保持比例填充整个容器 */
+    z-index: -1; /* 设置为较低的图层 */
+}
+
 /* 文本内按钮 */
 #backButton {
     background-color: transparent; /* 设置按钮背景颜色 */

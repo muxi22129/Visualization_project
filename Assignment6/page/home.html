@@ -15,7 +15,7 @@
 
 <body>
 <!-- 注释掉了背景图片，如果需要，可以取消下面这行代码的注释 -->
-<!--<img alt="homeBackground" src="/images/homeBackground.jpg" class="homeBackground-img">-->
+<img alt="homeBackground" src="/images/2.jpg" class="homeBackground-img">
 
 <!-- 用于加载悬浮按钮的容器 -->
 <div id="floating-button"></div>
@@ -23,7 +23,7 @@
 <!-- 下拉菜单容器，用于选择年份 -->
 <div class="select-container">
     <!-- 下拉菜单，用户可以选择年份，并且当选择改变时，会触发 loadDataForYear 函数加载对应年份的数据 -->
-    <select id="yearSelect" onchange="loadDataForYear(this.value)" class="styled-select">
+    <select id="yearSelect" onchange="loadDataForYear(this.value),loadRegionDataForYear(this.value)" class="styled-select">
         <!-- 为每一个年份提供一个选项 -->
         <option value="2013">2013年</option>
         <option value="2014">2014年</option>
@@ -40,14 +40,26 @@
 </div>
 
 <!-- 用于展示地图的容器 -->
-<div id="chart"></div>
+<div id = "chart"></div>
 <!-- 用于展示饼图的容器 -->
-<div id="pieChart"></div>
+<div id = "pieChart"></div>
+<!-- 用于展示雷达图的容器 -->
+<div id = "radar0"></div>
+<div id = "radar1"></div>
+<div id = "radar2"></div>
+
+<div class="vertical-line1"></div>
+<!--<div class="vertical-line2"></div>-->
+<!--<div class="vertical-line3"></div>-->
+<div class="horizontal-line1"></div>
 
 <script>
     // 初始化 echarts 实例
     const mapChart = echarts.init(document.getElementById('chart'));
     const pieChart = echarts.init(document.getElementById('pieChart'));
+    const radar0 = echarts.init(document.getElementById('radar0'));
+    const radar1 = echarts.init(document.getElementById('radar1'));
+    const radar2 = echarts.init(document.getElementById('radar2'));
 
     // 根据选择的年份，加载对应的数据
     function loadDataForYear(year) {
@@ -58,7 +70,7 @@
                 // 解析 CSV 数据并准备用于绘制图表的数据
                 var col = 2023 - year;
                 var GDPData = [];
-                var rows = data.split("\n");
+                var rows = data.split("\r\n");
                 for (var i = 0; i < rows.length; i++) {
                     var rowData = rows[i].split(",");
                     GDPData.push({name: rowData[0], value: parseFloat(rowData[col])});
@@ -228,9 +240,187 @@
             });
     }
 
+    function loadRegionDataForYear(year){
+        Promise.all([
+            fetch('../data/regionGDP.csv'),
+            fetch('../data/regionPopulation.csv')
+        ])
+            .then(responses => Promise.all(responses.map(response => response.text())))
+            .then(texts => { // 将两个 csv 文件中的数据转化为文本， texts[0] 为 GDP， texts[1] 为人口
+                let col = 2023 - year;
+                let rows0 = texts[0].split('\r\n');
+                let rows1 = texts[1].split('\r\n');
+                let GDPData = [];
+                let populationData = [];
+                let averageData = [];
+                for(let i = 0; i<rows0.length; i++){ // 获取对应年份的数据
+                    GDPData.push({name:rows0[i].split(',')[0], value: rows0[i].split(',')[col]});
+                    populationData.push({name:rows1[i].split(',')[0], value: rows1[i].split(',')[col]});
+                    averageData.push({name:rows1[i].split(',')[0], value: rows0[i].split(',')[col]/rows1[i].split(',')[col]});
+                }
+                // 寻找最大值
+                const values0 = GDPData.map(item => item.value);
+                const values1 = populationData.map(item => item.value);
+                const values2 = averageData.map(item => item.value);
+                const maxValue0 = Math.max(...values0);
+                const maxValue1 = Math.max(...values1);
+                const maxValue2 = Math.max(...values2);
+
+                const option0 = {
+                    title: {
+                        text: 'GDP雷达图',
+                        subtext: '单位：亿元',
+                        left: 'center',
+                        top:100
+                    },
+                    legend: {
+                        data: ['GDP'],
+                        right:30,
+                        top:200
+                    },
+                    radar: {
+                        // shape: 'circle',
+                        indicator: [
+                            { name: '华北', max: maxValue0},
+                            { name: '东北', max: maxValue0},
+                            { name: '华东', max: maxValue0},
+                            { name: '中南', max: maxValue0},
+                            { name: '西南', max: maxValue0},
+                            { name: '西北', max: maxValue0}
+                        ],
+                        name: {
+                            // 设置雷达图指示器名称的文本样式
+                            textStyle: {
+                                color: '#000000' // 文本颜色
+                            }
+                        },
+                    },
+                    series: [
+                        {
+                            name: 'GDP vs Population',
+                            type: 'radar',
+                            data: [
+                                {
+                                    value: [GDPData[0].value,GDPData[1].value,GDPData[2].value,GDPData[3].value,GDPData[4].value,GDPData[5].value],
+                                    name: 'GDP',
+                                    itemStyle: { color: '#f59f02' }, // 数据点的颜色设置
+                                    lineStyle: { // 线条样式
+                                        normal: {
+                                            color: 'rgb(245,159,2)', // 线条颜色为半透明的深蓝色
+                                            width: 2, // 线条宽度
+                                            // type: 'dashed' // 线条类型，默认为实线，可选：'dashed'（虚线）等
+                                        }
+                                    },
+                                }
+                            ]
+                        }
+                    ]
+                }
+
+                const option1 = {
+                    title: {
+                        text: '人口雷达图',
+                        subtext: '单位：万人',
+                        left: 'center',
+                        top:100
+                    },
+                    legend: {
+                        data: ['人口'],
+                        right:30,
+                        top:200
+                    },
+                    radar: {
+                        // shape: 'circle',
+                        indicator: [
+                            { name: '华北', max: maxValue1},
+                            { name: '东北', max: maxValue1},
+                            { name: '华东', max: maxValue1},
+                            { name: '中南', max: maxValue1},
+                            { name: '西南', max: maxValue1},
+                            { name: '西北', max: maxValue1}
+                        ],
+                        name: {
+                            // 设置雷达图指示器名称的文本样式
+                            textStyle: {
+                                color: '#000000' // 文本颜色
+                            }
+                        },
+                    },
+                    series: [
+                        {
+                            name: 'GDP vs Population',
+                            type: 'radar',
+                            data: [
+                                {
+                                    value: [populationData[0].value,populationData[1].value,populationData[2].value,populationData[3].value,populationData[4].value,populationData[5].value],
+                                    name: '人口'
+                                }
+                            ]
+                        }
+                    ]
+                }
+
+                const option2 = {
+                    title: {
+                        text: '人均GDP雷达图',
+                        subtext: '单位：亿元/万人',
+                        left: 'center',
+                        top:100
+                    },
+                    legend: {
+                        data: ['人均GDP'],
+                        right:0,
+                        top:200
+                    },
+                    radar: {
+                        // shape: 'circle',
+                        indicator: [
+                            { name: '华北', max: maxValue2},
+                            { name: '东北', max: maxValue2},
+                            { name: '华东', max: maxValue2},
+                            { name: '中南', max: maxValue2},
+                            { name: '西南', max: maxValue2},
+                            { name: '西北', max: maxValue2}
+                        ],
+                        name: {
+                            // 设置雷达图指示器名称的文本样式
+                            textStyle: {
+                                color: '#000000' // 文本颜色
+                            }
+                        },
+                    },
+                    series: [
+                        {
+                            name: 'GDP vs Population',
+                            type: 'radar',
+                            data: [
+                                {
+                                    value: [averageData[0].value,averageData[1].value,averageData[2].value,averageData[3].value,averageData[4].value,averageData[5].value],
+                                    name: '人均GDP',
+                                    itemStyle: { color: '#a403f6' }, // 数据点的颜色设置
+                                    lineStyle: { // 线条样式
+                                        normal: {
+                                            color: '#a403f6', // 线条颜色为半透明的深蓝色
+                                            width: 2, // 线条宽度
+                                            // type: 'dashed' // 线条类型，默认为实线，可选：'dashed'（虚线）等
+                                        }
+                                    },
+                                }
+                            ]
+                        }
+                    ]
+                }
+
+                radar0.setOption(option0, true);
+                radar1.setOption(option1, true);
+                radar2.setOption(option2, true);
+            })
+    }
+
     // 页面加载完成后默认显示最新一年的数据
     window.onload = function () {
         loadDataForYear('2022');
+        loadRegionDataForYear('2022');
     };
 
     // 在文档加载完毕后，调用 floatingButton 文件以实现悬浮按钮功能
